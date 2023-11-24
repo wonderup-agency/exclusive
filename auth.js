@@ -27,18 +27,36 @@ if (!isAuth()) {
   gsap.set(pageWrapper, { opacity: 0, display: "none", pointerEvents: "none" });
 
   // Exclusive logo animation
-  const logoState = Flip.getState(exclusiveLogo);
-  setTimeout(() => {
-    exclusiveContainer.appendChild(exclusiveLogo);
-    Flip.from(logoState, {
+  gsap.fromTo(
+    exclusiveLogo,
+    {
+      autoAlpha: 0,
+      opacity: 0,
+      scale: 0.95,
+      ease: "power3.inOut",
+    },
+    {
+      autoAlpha: 1,
+      opacity: 1,
+      scale: 1,
       duration: 2,
       ease: "power3.inOut",
-      absolute: true,
       onComplete: () => {
-        showPasscodeScreen();
+        const logoState = Flip.getState(exclusiveLogo);
+        setTimeout(() => {
+          exclusiveContainer.appendChild(exclusiveLogo);
+          Flip.from(logoState, {
+            duration: 3,
+            ease: "power4.inOut",
+            absolute: true,
+            onStart: () => {
+              setTimeout(showPasscodeScreen, 1000);
+            },
+          });
+        }, 1000);
       },
-    });
-  }, 1000);
+    }
+  );
 
   // append icon to button for passcode and request forms
   passcodeSubmit.appendChild(passcodeSubmitIcon);
@@ -95,9 +113,7 @@ async function passcodeHandler(e) {
     passcodeError.querySelector("p").textContent = response.data.message;
     gsap.to(passcodeError, { display: "flex" });
   } else {
-    console.log("200");
     const token = response.headers.get("X-Auth-Token");
-    console.log(token);
     if (!token) {
       passcodeError.querySelector("p").textContent = "Couldn't read auth token";
       return;
