@@ -1,20 +1,24 @@
 // Global variables
 const body = document.querySelector("body");
 const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+const path = window.location.pathname;
 
 // Auth
 function isAuth() {
   const jwtToken = localStorage.getItem("exclusiveJWT");
   if (jwtToken) {
-    const decodedToken = jwtDecode(jwtToken);
-    const expirationTime = decodedToken.exp;
-    const currentTime = Date.now() / 1000;
-    if (expirationTime > currentTime) {
-      return jwtToken;
+    try {
+      const decodedToken = jwtDecode(jwtToken);
+      const expirationTime = decodedToken.exp;
+      const currentTime = Date.now() / 1000;
+      if (expirationTime > currentTime) {
+        return jwtToken;
+      }
+      return false;
+    } catch (error) {
+      return false;
     }
-    return false;
   } else {
-    const path = window.location.pathname;
     if (path === "/") {
       return false;
     } else {
@@ -29,13 +33,19 @@ function setJWT(jwtToken) {
 // Responsive breakpoints
 function Desktop() {}
 function Tablet() {
-  destroyServicesSlider(servicesSwiper);
+  if (path === "/") {
+    destroyServicesSlider(servicesSwiper);
+  }
 }
 function Landscape() {
-  buildServicesSlider(servicesSwiper);
+  if (path === "/") {
+    buildServicesSlider(servicesSwiper);
+  }
 }
 function Portrait() {
-  buildServicesSlider(servicesSwiper);
+  if (path === "/") {
+    buildServicesSlider(servicesSwiper);
+  }
 }
 let currentCategory = null;
 function getScreenSizeCategory() {
