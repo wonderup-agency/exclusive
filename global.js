@@ -12,9 +12,12 @@ function isAuth() {
       const expirationTime = decodedToken.exp;
       const currentTime = Date.now() / 1000;
       if (expirationTime > currentTime) {
+        const expiresIn = expirationTime - currentTime;
         return jwtToken;
       }
-      return false;
+      if (path != "/") {
+        window.location.href = "/";
+      }
     } catch (error) {
       return false;
     }
