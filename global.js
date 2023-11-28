@@ -33,6 +33,73 @@ function setJWT(jwtToken) {
   localStorage.setItem("exclusiveJWT", jwtToken);
 }
 
+// Domains
+async function getDomains() {
+  try {
+    let headersList = {
+      Accept: "*/*",
+      Authorization: `Bearer ${localStorage.getItem("exclusiveJWT")}`,
+    };
+    let response = await fetch("https://exclusive-dev.vercel.app/api/domains", {
+      method: "GET",
+      headers: headersList,
+    });
+
+    let data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+function convertToFloat(currencyString) {
+  let numericString = currencyString.replace(/[$,]/g, '');
+  return parseFloat(numericString);
+}
+function extractTLD(domain) {
+  try {
+    if (typeof domain !== 'string' || domain.trim() === '') {
+      return;
+    }
+    domain = domain.toLowerCase().trim();
+    let parts = domain.split('.');
+    if (parts.length < 2) {
+      return;
+    }
+    return parts[parts.length - 1];
+  } catch (error) {
+    console.error(error.message);
+    return null;
+  }
+}
+function extractSLD(domain) {
+  try {
+    if (typeof domain !== 'string' || domain.trim() === '') {
+      return;
+    }
+
+    let parts = domain.split('.');
+    if (parts.length > 2) {
+      return;
+    }
+    return parts[parts.length - 2];
+  } catch (error) {
+    console.error(error.message);
+    return null;
+  }
+}
+function domainToColor(domain) {
+  let hash = 0;
+  for (let i = 0; i < domain.length; i++) {
+      hash = domain.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  let color = '#';
+  for (let i = 0; i < 3; i++) {
+      const value = (hash >> (i * 8)) & 0xFF;
+      color += ('00' + value.toString(16)).substr(-2);
+  }
+  return color;
+}
+
 // Responsive breakpoints
 function Desktop() {}
 function Tablet() {
