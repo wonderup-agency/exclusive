@@ -12,6 +12,7 @@ const passcodeError = document.querySelector("[data-passcode='error']");
 const passcodeSubmit = document.querySelector("[data-passcode='submit']");
 const passcodeSubmitIcon = document.querySelector("[data-passcode='submit-icon']");
 const passcodeRequest = document.querySelectorAll("[data-passcode='request']");
+const passcodeCal = document.querySelectorAll("[data-passcode='cal']");
 
 const requestPane = document.querySelector("[data-request='pane']");
 const requestForm = document.querySelector("[data-request='form']");
@@ -20,6 +21,9 @@ const requestRealSubmit = document.querySelector("[data-request='real-submit']")
 const requestSubmitIcon = document.querySelector("[data-request='submit-icon']");
 const requestSubmiting = document.querySelector("[data-request='submiting']");
 const requestBack = document.querySelectorAll("[data-request='back']");
+
+const calPane = document.querySelector("[data-cal='pane']");
+const calBack = document.querySelector("[data-cal='back']");
 
 if (!isAuth()) {
   gsap.set(authScreen, { display: "block" });
@@ -39,21 +43,21 @@ if (!isAuth()) {
       autoAlpha: 1,
       opacity: 1,
       scale: 1,
-      duration: 2,
+      duration: 1,
       ease: "power3.inOut",
       onComplete: () => {
         const logoState = Flip.getState(exclusiveLogo);
         setTimeout(() => {
           exclusiveContainer.appendChild(exclusiveLogo);
           Flip.from(logoState, {
-            duration: 3,
+            duration: 1,
             ease: "power4.inOut",
             absolute: true,
             onStart: () => {
-              setTimeout(showPasscodeScreen, 1000);
+              setTimeout(showPasscodeScreen, 0);
             },
           });
-        }, 1000);
+        }, 0);
       },
     }
   );
@@ -83,13 +87,61 @@ if (!isAuth()) {
       setTimeout(showRequestScreen, 1000);
     });
   });
+  // go to book call pane
+  passcodeCal.forEach((button) => {
+    button.addEventListener("click", () => {
+      hidePasscodeScreen();
+      setTimeout(showCalScreen, 1000);
+    });
+  });
 
-  // go to passcode pane
+  // go to passcode pane (from request pane)
   requestBack.forEach((button) => {
     button.addEventListener("click", () => {
       hideRequestScreen();
       setTimeout(showPasscodeScreen, 1000);
     });
+  });
+  // go to passcode pane (from cal pane)
+  calBack.addEventListener("click", () => {
+    hideCalScreen();
+    setTimeout(showPasscodeScreen, 1000);
+  });
+
+  // Cal embed
+  (function (C, A, L) {
+    let p = function (a, ar) {
+      a.q.push(ar);
+    };
+    let d = C.document;
+    C.Cal =
+      C.Cal ||
+      function () {
+        let cal = C.Cal;
+        let ar = arguments;
+        if (!cal.loaded) {
+          cal.ns = {};
+          cal.q = cal.q || [];
+          d.head.appendChild(d.createElement("script")).src = A;
+          cal.loaded = true;
+        }
+        if (ar[0] === L) {
+          const api = function () {
+            p(api, arguments);
+          };
+          const namespace = ar[1];
+          api.q = api.q || [];
+          typeof namespace === "string" ? (cal.ns[namespace] = api) && p(api, ar) : p(cal, ar);
+          return;
+        }
+        p(cal, ar);
+      };
+  })(window, "https://app.cal.com/embed/embed.js", "init");
+  Cal("init", { origin: "https://app.cal.com" });
+
+  Cal("inline", {
+    elementOrSelector: "[data-cal='embed']",
+    calLink: "exclusive",
   });
 } else {
   gsap.set(authScreen, { display: "none" });
@@ -212,11 +264,49 @@ function showRequestScreen() {
     }
   );
 }
+function showCalScreen() {
+  gsap.fromTo(
+    calPane,
+    {
+      display: "none",
+      opacity: 0,
+      x: "2rem",
+      y: 0,
+    },
+    {
+      display: "flex",
+      opacity: 1,
+      x: 0,
+      y: 0,
+      duration: 1,
+      ease: "power3.inOut",
+    }
+  );
+}
 function hideRequestScreen() {
   gsap.fromTo(
     requestPane,
     {
       display: "block",
+      opacity: 1,
+      x: 0,
+      y: 0,
+    },
+    {
+      display: "none",
+      opacity: 0,
+      x: "2rem",
+      y: 0,
+      ease: "power3.inOut",
+      duration: 1,
+    }
+  );
+}
+function hideCalScreen() {
+  gsap.fromTo(
+    calPane,
+    {
+      display: "flex",
       opacity: 1,
       x: 0,
       y: 0,
