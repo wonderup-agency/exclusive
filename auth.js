@@ -172,6 +172,7 @@ async function passcodeHandler(e) {
     }
     setJWT(token);
     hideAuthScreen();
+    loadGlobalCal();
   }
 }
 async function submitPasscode(passcode) {
