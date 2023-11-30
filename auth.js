@@ -36,13 +36,11 @@ if (!isAuth()) {
     {
       autoAlpha: 0,
       opacity: 0,
-      scale: 0.95,
       ease: "power3.inOut",
     },
     {
       autoAlpha: 1,
       opacity: 1,
-      scale: 1,
       duration: 1,
       ease: "power3.inOut",
       onComplete: () => {
@@ -50,11 +48,11 @@ if (!isAuth()) {
         setTimeout(() => {
           exclusiveContainer.appendChild(exclusiveLogo);
           Flip.from(logoState, {
-            duration: 1,
+            duration: 2,
             ease: "power4.inOut",
             absolute: true,
             onStart: () => {
-              setTimeout(showPasscodeScreen, 0);
+              setTimeout(showPasscodeScreen, 500);
             },
           });
         }, 0);
