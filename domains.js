@@ -1,8 +1,6 @@
 (async function allCollections() {
     const allDomains = await getDomains();
     window.allDomains = allDomains;
-
-    /* ### All Domains ### */
     const domainElementTemplate = document.querySelector("[data-domain='template']");
     if (domainElementTemplate) {
       allDomains.forEach((domain) => {

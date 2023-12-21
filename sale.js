@@ -9,7 +9,7 @@
   window.allDomains = allDomains;
   /* ### Collections ### */
   // $100k+ domains
-  const hundredKplusElement = document.querySelector("[data-collection='hundredK+']");
+  const hundredKplusElement = document.querySelector("[data-collection='100k-plus']");
   if (hundredKplusElement) {
     const hundredKplusDomains = allDomains.filter((domain) => {
       if (domain.price === undefined || domain.price === null || domain.price === "") {
@@ -24,7 +24,7 @@
     hundredKplusElement.querySelector("[data-collection='domains']").textContent = `${hundredKplusDomains.length} domains`;
   }
   // Premium.AI domains
-  const premiumAIElement = document.querySelector("[data-collection='premium .ai']");
+  const premiumAIElement = document.querySelector("[data-collection='premium-ai']");
   if (premiumAIElement) {
     const premiumAIDomains = allDomains.filter((domain) => {
       return extractTLD(domain.domain_name) === "ai";
@@ -32,7 +32,7 @@
     premiumAIElement.querySelector("[data-collection='domains']").textContent = `${premiumAIDomains.length} domains`;
   }
   // Short word domains
-  const shortWordElement = document.querySelector("[data-collection='short word']");
+  const shortWordElement = document.querySelector("[data-collection='short-word']");
   if (shortWordElement) {
     const shortWordDomains = allDomains.filter((domain) => {
       return extractSLD(domain.domain_name).length <= 4;
@@ -124,7 +124,29 @@
     });
     domainElementTemplate.remove();
   }
+  domainsLoaded();
 })();
+
+function domainsLoaded() {
+  const inquireModal = document.querySelector("[data-inquire='component']");
+  const inquireModalClose = [document.querySelector("[data-inquire='overlay']"), document.querySelector("[data-inquire='close']")]
+  inquireModalClose.forEach(closeButton => {
+    closeButton.addEventListener("click", (e) => {
+      inquireModal.classList.remove("is-active");
+    })
+  })
+  const domainField = document.querySelector("[data-inquire='domain-field']");
+  domainField.setAttribute("disabled","");
+  window.addEventListener("click", (e) => {
+    const target = e.target;
+    const domainClicked = target.closest("[data-domain='template']") || target.closest("[data-featured='template']");
+    if (domainClicked) {
+      const domainName = domainClicked.querySelector("[data-domain='domain']").textContent;
+      inquireModal.classList.add("is-active");
+      domainField.value = domainName;
+    }
+  })
+}
 
 // Collections slider
 const collectionsWrapper = document.querySelector("[data-swiper='collections-slider']");

@@ -75,12 +75,20 @@ function loadGlobalCal() {
 
 // Domains
 async function getDomains() {
+  const type = document.querySelector("[data-domain-type]");
+  let typeParam = ''
+  if(type) {
+    typeParam = `type=${type.getAttribute("data-domain-type")}`
+  }
+  
+  const queryParams = typeParam
+
   try {
     let headersList = {
       Accept: "*/*",
       Authorization: `Bearer ${localStorage.getItem("exclusiveJWT")}`,
     };
-    let response = await fetch("https://exclusive-dev.vercel.app/api/domains", {
+    let response = await fetch(`https://exclusive-dev.vercel.app/api/domains?${queryParams}`, {
       method: "GET",
       headers: headersList,
     });
