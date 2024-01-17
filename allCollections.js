@@ -1,8 +1,6 @@
 (async function allCollections() {
   const allDomains = await getDomains();
 
-  console.log(allDomains[0]);
-
   // $100k+ domains
   const hundredKplusElement = document.querySelector("[data-collection='hundredK+']");
   if (hundredKplusElement) {

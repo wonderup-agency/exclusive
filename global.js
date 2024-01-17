@@ -34,7 +34,7 @@ function setJWT(jwtToken) {
 }
 
 // Cal embed
-if(isAuth()) {
+if (isAuth()) {
   loadGlobalCal();
 }
 function loadGlobalCal() {
@@ -74,14 +74,17 @@ function loadGlobalCal() {
 }
 
 // Domains
-async function getDomains() {
+async function getDomains(paramsRequested) {
   const type = document.querySelector("[data-domain-type]");
-  let typeParam = ''
-  if(type) {
-    typeParam = `type=${type.getAttribute("data-domain-type")}`
+  let typeParam = "";
+  if (type) {
+    typeParam = `type=${type.getAttribute("data-domain-type")}`;
   }
-  
-  const queryParams = typeParam
+
+  var queryParams = typeParam;
+  if (paramsRequested) {
+    queryParams += "&" + paramsRequested;
+  }
 
   try {
     let headersList = {
@@ -99,17 +102,34 @@ async function getDomains() {
     console.log(error);
   }
 }
+async function getTlds() {
+  try {
+    let headersList = {
+      Accept: "*/*",
+      Authorization: `Bearer ${localStorage.getItem("exclusiveJWT")}`,
+    };
+    let response = await fetch(`https://exclusive-dev.vercel.app/api/domains?type=tld`, {
+      method: "GET",
+      headers: headersList,
+    });
+
+    let data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+}
 function convertToFloat(currencyString) {
-  let numericString = currencyString.replace(/[$,]/g, '');
+  let numericString = currencyString.replace(/[$,]/g, "");
   return parseFloat(numericString);
 }
 function extractTLD(domain) {
   try {
-    if (typeof domain !== 'string' || domain.trim() === '') {
+    if (typeof domain !== "string" || domain.trim() === "") {
       return;
     }
     domain = domain.toLowerCase().trim();
-    let parts = domain.split('.');
+    let parts = domain.split(".");
     if (parts.length < 2) {
       return;
     }
@@ -121,11 +141,11 @@ function extractTLD(domain) {
 }
 function extractSLD(domain) {
   try {
-    if (typeof domain !== 'string' || domain.trim() === '') {
+    if (typeof domain !== "string" || domain.trim() === "") {
       return;
     }
 
-    let parts = domain.split('.');
+    let parts = domain.split(".");
     if (parts.length > 2) {
       return;
     }
@@ -138,14 +158,37 @@ function extractSLD(domain) {
 function domainToColor(domain) {
   let hash = 0;
   for (let i = 0; i < domain.length; i++) {
-      hash = domain.charCodeAt(i) + ((hash << 5) - hash);
+    hash = domain.charCodeAt(i) + ((hash << 5) - hash);
   }
-  let color = '#';
+  let color = "#";
   for (let i = 0; i < 3; i++) {
-      const value = (hash >> (i * 8)) & 0xFF;
-      color += ('00' + value.toString(16)).substr(-2);
+    const value = (hash >> (i * 8)) & 0xff;
+    color += ("00" + value.toString(16)).substr(-2);
   }
   return color;
+}
+function instantiateDomain(template, domain) {
+  const domainElementCopy = template.cloneNode(true);
+  const domainColor = domainElementCopy.querySelector("[data-domain='color']");
+  const domainName = domainElementCopy.querySelector("[data-domain='domain']");
+  const domainPrice = domainElementCopy.querySelector("[data-domain='price']");
+  domainName.textContent = domain.domain_name.charAt(0).toUpperCase() + domain.domain_name.slice(1);
+  domainPrice.textContent = formatPrice(domain.price);
+  domainColor.style.backgroundColor = createBgColor(domain.domain_name);
+  domainElementCopy.style.display = "block";
+  domainElementCopy.style.visibility = "visible";
+  domainElementCopy.setAttribute("is-copy", "");
+  template.parentNode.appendChild(domainElementCopy);
+}
+function querifyParams(params) {
+  return Object.keys(params)
+    .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
+    .join("&");
+}
+function removePreviousDomains() {
+  document.querySelectorAll("[is-copy]").forEach((domain) => {
+    domain.remove();
+  });
 }
 
 // Responsive breakpoints

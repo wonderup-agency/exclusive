@@ -110,33 +110,29 @@
   }
 
   /* ### All Domains ### */
-  const domainElementTemplate = document.querySelector("[data-domain='template']");
+  const paignatedDomains = await getDomains(querifyParams(requestParams));
+  window.paignatedDomains = paignatedDomains;
   if (domainElementTemplate) {
-    allDomains.forEach((domain) => {
-      const domainElementCopy = domainElementTemplate.cloneNode(true);
-      const domainColor = domainElementCopy.querySelector("[data-domain='color']");
-      const domainName = domainElementCopy.querySelector("[data-domain='domain']");
-      const domainPrice = domainElementCopy.querySelector("[data-domain='price']");
-      domainName.textContent = domain.domain_name.charAt(0).toUpperCase() + domain.domain_name.slice(1);
-      domainPrice.textContent = formatPrice(domain.price)
-      domainColor.style.backgroundColor = createBgColor(domain.domain_name);
-      domainElementTemplate.parentNode.appendChild(domainElementCopy);
+    paignatedDomains.forEach((domain) => {
+      instantiateDomain(domainElementTemplate, domain)
     });
-    domainElementTemplate.remove();
+    domainElementTemplate.style.display = "none";
+    domainElementTemplate.style.visibility = "hidden";
   }
   domainsLoaded();
 })();
 
 function domainsLoaded() {
+  // Inquire modal
   const inquireModal = document.querySelector("[data-inquire='component']");
-  const inquireModalClose = [document.querySelector("[data-inquire='overlay']"), document.querySelector("[data-inquire='close']")]
-  inquireModalClose.forEach(closeButton => {
+  const inquireModalClose = [document.querySelector("[data-inquire='overlay']"), document.querySelector("[data-inquire='close']")];
+  inquireModalClose.forEach((closeButton) => {
     closeButton.addEventListener("click", (e) => {
       inquireModal.classList.remove("is-active");
-    })
-  })
+    });
+  });
   const domainField = document.querySelector("[data-inquire='domain-field']");
-  domainField.setAttribute("disabled","");
+  domainField.setAttribute("disabled", "");
   window.addEventListener("click", (e) => {
     const target = e.target;
     const domainClicked = target.closest("[data-domain='template']") || target.closest("[data-featured='template']");
@@ -145,7 +141,7 @@ function domainsLoaded() {
       inquireModal.classList.add("is-active");
       domainField.value = domainName;
     }
-  })
+  });
 }
 
 // Collections slider
